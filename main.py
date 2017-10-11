@@ -7,49 +7,61 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:lc101@loca
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
-
 class Blog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
     body = db.Column(db.Text)
 
-    def __init__(self, name):
+    def __init__(self, title, body):
         self.title = title
         self.body = body
 
-
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/blog', methods=['POST', 'GET'])
 def index():
 
-    if request.method == 'POST':
-        blog_title = request.form['blog']
-        new_blog = Blog(blog_name)
-        db.session.add(new_blog)
-        db.session.commit()
-
     blogs = Blog.query.all()
+    blog = request.args.get('id', '')
+    blog_id = blog
+
+    if blog_id != '':
+        blog = Blog.query.filter_by(id=blog_id).first()
+        title = blog.title
+        body = blog.body
+        return render_template("entry.html", blog_title=title, blog_body=body)
     
-    return render_template('blog.html',title="Get It Done!", 
+    return render_template('blog.html', 
         blogs=blogs)
 
-# TODO - create /blog route to display all blog posts
-# TODO - create functionality to submit new blogs using the /newpost route
-# TODO - after new blog submission, display main blog page
-# TODO - create newpost.html to handle above case
-# TODO - in base.html include navigation links to /blog and /newpost
-# TODO - "Display Individual Entries" etc.
+@app.route('/newpost', methods=['GET', 'POST'])
+def newpost():
 
-@app.route('/delete-task', methods=['POST'])
-def delete_task():
+    error = ''
+    if request.method == 'POST':
+        blog_title = request.form['title']
+        blog_body = request.form['body']
+        if blog_title == '' or blog_body == '':
+            error = "Did you forget to write something?"
+            return render_template('newpost.html', error=error, blog_title=blog_title, blog_body=blog_body)
+        else:   
+            new_blog = Blog(blog_title, blog_body)
+            db.session.add(new_blog)
+            db.session.commit()
+            new_id = str(new_blog.id)
+            return redirect('/blog?id=' + new_id)
 
-    task_id = int(request.form['task-id'])
-    task = Task.query.get(task_id)
-    task.completed = True
-    db.session.add(task)
-    db.session.commit()
+    return render_template('newpost.html', error=error)
 
-    return redirect('/')
+
+@app.route('/entry')
+def entry():
+
+    entry_id = int(request.form['blog-id'])
+    entry = Blog.query.get(entry_id)
+    entry_title = Blog.query.get(title)
+    entry_body = Blog.query.get(body)
+
+    return render_template('entry.html', title=entry_title, body=entry_body)
 
 
 if __name__ == '__main__':
