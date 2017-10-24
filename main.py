@@ -8,12 +8,6 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = 'OhBabyBabyHowWasISupposedToKnow'
 
-# TODO - Clean up signup/login/index.html
-# TODO - Make better error messages for login/register
-# TODO - singleUser.html will be dynamicly generated at /blog when including 'user' parameter
-# TODO - route handlers for signup, login and index
-# TODO - logout functions that handle 'post' to /logout, redirect to /blog and delete username from session
-
 class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -122,12 +116,6 @@ def blog():
         owner = User.query.filter_by(id=user).first()
         blogs = Blog.query.filter_by(owner=owner).all()
         return render_template('blog.html', blogs=blogs)
-
-    # if 'username' in session:
-    #     owner = User.query.filter_by(username=session['username']).first()
-    #     blogs = Blog.query.filter_by(owner=owner).all()
-    # else:
-    #     blogs = Blog.query.all()
     
     return render_template('blog.html', blogs=blogs)
 
@@ -168,9 +156,6 @@ def singleUser():
     if 'username' in session:
         owner = User.query.filter_by(username=session['username']).first()
         blogs = Blog.query.filter_by(owner=owner).all()
-    # user = session['username']
-    # owner = User.query.filter_by(id=user).first()
-    # blogs = Blog.query.filter_by(owner=owner).all()
         return render_template('singleUser.html', blogs=blogs)
 
 @app.route('/', methods=['GET', 'POST'])
