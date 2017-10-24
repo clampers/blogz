@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <hr />
+
+    {% if users|length == 0 %}
+    <p>no users yet</p>
+    {% else %}
+
+        <ul>
+            <p>this seems dangerous</p>
+            {% for each in users %}
+            <li><a href="blog?user={{ each.id }}" style="display:inline-block;"/>{{ each.username }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+
+    {% endif %}
+
+{% endblock %}

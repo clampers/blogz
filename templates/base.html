@@ -9,7 +9,17 @@
         </style>
     </head>
 <body>
-<a href="/blog">Main Blog Page</a> <a href="/newpost">Add an Entry</a>
+<a href="/">Main Blog Page</a> 
+{% if 'username' in session %}
+<a href="/singleUser">My Posts</a>
+<a href="/newpost">Add an Entry</a>
+<p> Logged in as {{ session['username'] }}</p>
+
+<a href="/logout" method='post'>Logout</a>
+{% else %}
+<a href="/login">Login</a>
+<a href="/signup">Sign up</a>
+{% endif %}
     {% block content %}
     {% endblock %}
 
